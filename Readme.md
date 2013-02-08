@@ -1,5 +1,5 @@
 
-# stylish
+# beam
 
   funky get/set styles on an element
 

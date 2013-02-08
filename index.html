@@ -18,12 +18,12 @@
     <script src="build/build.js"></script>
     
     <script>
-        var tractor = require('tractor')(),
+        var beam = require('tractor')(),
             box = document.getElementById('box');
         
 
         setInterval(function(){
-            tractor.beam(box, {
+            beam(box, {
                 top:Math.random()*400,
                 left:Math.random()*400,
                 opacity: Math.random()*2,

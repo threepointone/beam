@@ -95,8 +95,15 @@ function Tractor(config) {
     if(!(this instanceof Tractor)) return new Tractor(config);
 
     this.config = config || {};
+    var t = this;
+    var _beam = this.beam;
+    this.beam = function(){
+        return _beam.apply(t, arguments);
+    };
 
     animloop.start();
+
+    return this.beam;
 
 }
 
