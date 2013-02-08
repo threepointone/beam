@@ -1,0 +1,17 @@
+{
+  "name": "tractor",
+  "repo": "threepointone/tractor",
+  "description": "funky get/set styles on an element",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {
+    "threepointone/twain": "*",
+    "threepointone/animloop": "*",
+    "threepointone/claw": "*"
+  },
+  "development": {},
+  "license": "MIT",
+  "scripts": [
+    "index.js"
+  ]
+}

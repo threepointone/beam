@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+        #box{
+            width:200px;
+            height:200px;
+            background-color: gray;
+            position: absolute;
+            top:0;
+            left:0;
+        }
+    </style>
+</head>
+<body>
+    <div id="box"></div>
+    <script src="build/build.js"></script>
+    
+    <script>
+        var tractor = require('tractor')(),
+            box = document.getElementById('box');
+        
+
+        setInterval(function(){
+            tractor.beam(box, {
+                top:Math.random()*400,
+                left:Math.random()*400,
+                opacity: Math.random()*2,
+                'border-radius': Math.random()*40,
+                height: Math.random()*200,
+                width: Math.random()*200
+            });
+        },500);
+
+    </script>
+
+</body>
+</html>
