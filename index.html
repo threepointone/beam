@@ -10,6 +10,7 @@
             position: absolute;
             top:0;
             left:0;
+            opacity:0;
         }
     </style>
 </head>
@@ -29,9 +30,15 @@
                 opacity: Math.random()*2,
                 'border-radius': Math.random()*40,
                 height: Math.random()*200,
-                width: Math.random()*200
+                width: Math.random()*200,
+                transform:{
+                    rotate: (Math.random()*360 - 360) + 'deg'
+                    // skewX: Math.random()*30
+                    // scaleX:(Math.random()*2) + 0.1,
+                    // scaleY:(Math.random()*2) + 0.1
+                }
             });
-        },500);
+        },800);
 
     </script>
 

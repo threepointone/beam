@@ -23,7 +23,8 @@ var doc = document,
         zoom: 1,
         zIndex: 1,
         opacity: 1,
-        transform: 1
+        transform: 1,
+        scale: 1
     };
 
 
@@ -32,7 +33,6 @@ function camelize(s) {
         return m1.toUpperCase();
     });
 }
-
 
 function uppercase(p, a) {
     return a.toUpperCase();
@@ -53,7 +53,8 @@ function vendor(property) {
 
 function unit(style) {
     // extracts the unit part of the string. px, em, whatever. 
-    return 'px';
+    return (/[a-z]+/.exec(style)||['px'])[0]
+    // return 'px';
 }
 
 function num(style) {
@@ -91,9 +92,9 @@ function(el, property) {
     return el.style[camelize(property)];
 };
 
-// typeof style === 'number'
-
 function setStyle(el, prop, val) {
+    // "special" setStyle
+    // fyi: typeof val === 'number'
     if(typeof prop !== 'string') {
         each(prop, function(v, p) {
             setStyle(el, p, v);
@@ -104,7 +105,7 @@ function setStyle(el, prop, val) {
     prop = camelize(prop);
     // ok, so this the weird part 
     // because we're getting a number, we need to add unit to it 
-    // we get that directly from the element
+    // we get that directly from the __beam__ stored on the element
     // fuck me, right?
     el.style[prop] = val + (unitless[prop] ? '' : el.__beam__.$t(prop).unit);
 }
@@ -112,6 +113,8 @@ function setStyle(el, prop, val) {
 var instances = [];
 
 function track(el) {
+    // lemme know when proper object hashes become mainstream. 
+    // until then, carry on young man
     if(el.__beam__) {
         return el.__beam__;
     }
@@ -121,8 +124,14 @@ function track(el) {
     });
 
     // run a separate one for transforms
-    twain.transformer = Twain().update(function(step) {
-        claw(el, step);
+    var transformer = twain.transformer = Twain().update(function(step) {
+        // get back units
+        var o = {};
+        each(step, function(val, prop){
+            o[prop] = val + (unitless[prop] ? '' : transformer.$t(prop).unit);
+        });
+        // console.log(o);
+        claw(el, o);
     });
     instances.push(twain);
 
@@ -134,6 +143,7 @@ function beam(el, to) {
     var tracker = track(el);
     var o = {};
     each(to, function(val, _prop) {
+
         if(_prop === 'transform') return;
         var prop = camelize(vendor(_prop) + _prop);
         if(!tracker.tweens[prop]) {
@@ -143,12 +153,18 @@ function beam(el, to) {
             var tween = tracker.$t(prop).from(isValue(numerical) ? numerical : num(val));
             tween.unit = unit(currentStyle); // MASSIVE todo 
         }
-
-        o[prop] = num(val);
+        tracker.$t(prop).to(num(val));
     });
-    tracker.to(o);
+
     if(to.transform) {
-        tracker.transformer.to(to.transform);
+        var tr = {};
+        var transformer = tracker.transformer;
+        each(to.transform, function(val, prop){
+            // not doing the currentStyle business here.
+            // yet.
+            transformer.$t(prop).to(num(val)).unit = unit(val);
+        });
+        
     }
     // return a curried version of self. awesome-o. 
     return function(d) {
@@ -157,6 +173,15 @@ function beam(el, to) {
 }
 
 beam.instances = instances;
+
+beam.stop = function(el) {
+    // stop/pause the anim loop
+    // if not el, then stop EVERYTHING.
+};
+beam.start = function(el) {
+    // start up the anim loop after being paused
+    // if not el, start up everything
+}
 
 // start off animation loop. 
 
