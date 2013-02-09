@@ -93,7 +93,7 @@ function(el, property) {
 // typeof style === 'number'
 
 
-function setStyle(el, prop, style) {
+function setStyle(el, prop, val) {
     if(typeof prop !== 'string') {
         each(prop, function(v, p) {
             setStyle(el, p, v);
@@ -106,16 +106,8 @@ function setStyle(el, prop, style) {
     // because we're getting a number, we need to add unit to it 
     // we get that directly from the element
     // fuck me, right?
-    el.style[prop] = style + unitless[prop] ? '' : el.__beam__.$t(prop).unit;
+    el.style[prop] = val + (unitless[prop] ? '' : el.__beam__.$t(prop).unit);
 }
-
-// cheap and easy json cloning
-
-function clone(o) {
-    return JSON.parse(JSON.stringify(o));
-}
-
-
 
 var instances = [];
 
@@ -148,7 +140,7 @@ function beam(el, to) {
             var currentStyle = getStyle(el, prop);
             // this inits the specific Tween
             var tween = tracker.$t(prop).from(num(currentStyle) || num(val));            
-            tween.unit = unit(currentStyle) || 'px'; // todo
+            tween.unit = unit(currentStyle); // MASSIVE todo 
         }
 
         o[prop] = num(val);
