@@ -5,7 +5,7 @@
 
 ## Installation
 
-    $ component install threepointone/stylish
+    $ component install threepointone/beam
 
 ## API
 

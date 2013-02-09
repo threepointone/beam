@@ -1,14 +1,30 @@
-var animloop = require('animloop'),
+var claw = require('claw'),
     Twain = require('twain');
 each = Twain.util.each, collect = Twain.util.collect, isValue = Twain.util.isValue;
 
-var doc = document,
-    numUnit = /^(?:[\+\-]=)?\d+(?:\.\d+)?(%|in|cm|mm|em|ex|pt|pc|px)$/;
 
-// does this browser support the opacity property?
-var opasity = function() {
-        return typeof doc.createElement('a').style.opacity !== 'undefined';
-    }();
+var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || fallback;
+
+var prev = new Date().getTime();
+
+function fallback(fn) {
+    var curr = new Date().getTime();
+    var ms = Math.max(0, 16 - (curr - prev));
+    setTimeout(fn, ms);
+    prev = curr;
+}
+
+
+var doc = document,
+    numUnit = /^(?:[\+\-]=)?\d+(?:\.\d+)?(%|in|cm|mm|em|ex|pt|pc|px)$/,
+    unitless = {
+        lineHeight: 1,
+        zoom: 1,
+        zIndex: 1,
+        opacity: 1,
+        transform: 1
+    };
+
 
 function camelize(s) {
     return s.replace(/-(.)/g, function(m, m1) {
@@ -74,6 +90,9 @@ function(el, property) {
     return el.style[camelize(property)]
 };
 
+// typeof style === 'number'
+
+
 function setStyle(el, prop, style) {
     if(typeof prop !== 'string') {
         each(prop, function(v, p) {
@@ -81,77 +100,81 @@ function setStyle(el, prop, style) {
         });
         return;
     }
+
+    prop = camelize(prop);
     // ok, so this the weird part 
     // because we're getting a number, we need to add unit to it 
     // we get that directly from the element
     // fuck me, right?
-    el.style[camelize(prop)] = style + (prop === 'opacity' ? '' : el.__tractor__.$t(prop).unit);
+    el.style[prop] = style + unitless[prop] ? '' : el.__beam__.$t(prop).unit;
+}
+
+// cheap and easy json cloning
+
+function clone(o) {
+    return JSON.parse(JSON.stringify(o));
 }
 
 
-function Tractor(config) {
 
+var instances = [];
 
-    if(!(this instanceof Tractor)) return new Tractor(config);
-
-    this.config = config || {};
-    var t = this;
-    var _beam = this.beam;
-    this.beam = function(){
-        return _beam.apply(t, arguments);
-    };
-
-    animloop.start();
-
-    return this.beam;
-
-}
-
-Tractor.instances = [];
-
-
-
-Tractor.prototype.beam = function(el, to) {
-    if(!el.__tractor__) {
-        el.__tractor__ = Twain(this.config).update(function(step) {
-            setStyle(el, step);
-        });
-        Tractor.instances.push(el.__tractor__);
+function track(el) {
+    if(el.__beam__) {
+        return el.__beam__;
     }
-    var tractor = el.__tractor__;
 
+    var twain = Twain().update(function(step) {
+        setStyle(el, step);
+    });
+
+    // run a separate one for transforms
+    twain.transformer = Twain().update(function(step) {        
+        claw(el, step);
+    });
+    instances.push(twain);
+
+    el.__beam__ = twain;
+    return twain;
+}
+
+function beam(el, to) {
+    var tracker = track(el);
     var o = {};
-    each(to, function(val, prop) {
-
-        prop = vendor(prop) + prop;
-
-        if(!tractor.tweens[prop]) {
+    each(to, function(val, _prop) {
+        if(_prop === 'transform') return;
+        var prop = camelize(vendor(_prop) + _prop);
+        if(!tracker.tweens[prop]) {
             var currentStyle = getStyle(el, prop);
-            var _unit = unit(currentStyle) || 'px';
-            var _num = num(currentStyle);
             // this inits the specific Tween
-            tractor.$t(prop).unit = _unit;
-            if(isValue(_num)) {
-                tractor.$t(prop).from(_num);
-            }
-
+            var tween = tracker.$t(prop).from(num(currentStyle) || num(val));            
+            tween.unit = unit(currentStyle) || 'px'; // todo
         }
 
         o[prop] = num(val);
-
-
     });
-    tractor.to(o);
+    tracker.to(o);
+    if(to.transform) {
+        tracker.transformer.to(to.transform);
+    }
+    // return a curried version of self. awesome-o. 
+    return function(d) {
+        return beam(el, d);
+    };
+}
 
+beam.instances = instances;
 
-};
+// start off animation loop. 
 
-animloop.on('beforedraw', function() {
-    each(Tractor.instances, function(t) {
+function animate() {
+    raf(animate);
+    each(instances, function(t) {
         t.update();
+        t.transformer.update();
     });
-});
+}
 
+animate();
 
-
-module.exports = Tractor;
+module.exports = beam;
