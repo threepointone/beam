@@ -23,8 +23,7 @@ var doc = document,
         zoom: 1,
         zIndex: 1,
         opacity: 1,
-        transform: 1,
-        scale: 1
+        transform: 1
     };
 
 
@@ -51,10 +50,9 @@ function vendor(property) {
     return null; // not found...
 }
 
-function unit(style) {
+function unit(style, def) {
     // extracts the unit part of the string. px, em, whatever. 
-    return (/[a-z]+/.exec(style)||['px'])[0]
-    // return 'px';
+    return(/[a-z]+/.exec(style) || [def])[0]
 }
 
 function num(style) {
@@ -127,10 +125,9 @@ function track(el) {
     var transformer = twain.transformer = Twain().update(function(step) {
         // get back units
         var o = {};
-        each(step, function(val, prop){
+        each(step, function(val, prop) {
             o[prop] = val + (unitless[prop] ? '' : transformer.$t(prop).unit);
         });
-        // console.log(o);
         claw(el, o);
     });
     instances.push(twain);
@@ -151,20 +148,18 @@ function beam(el, to) {
             var numerical = num(currentStyle);
             // this inits the specific Tween
             var tween = tracker.$t(prop).from(isValue(numerical) ? numerical : num(val));
-            tween.unit = unit(currentStyle); // MASSIVE todo 
+            tween.unit = unit(currentStyle, 'px');
         }
         tracker.$t(prop).to(num(val));
     });
 
     if(to.transform) {
-        var tr = {};
-        var transformer = tracker.transformer;
-        each(to.transform, function(val, prop){
+        each(to.transform, function(val, prop) {
             // not doing the currentStyle business here.
             // yet.
-            transformer.$t(prop).to(num(val)).unit = unit(val);
+            tracker.transformer.$t(prop).to(num(val)).unit = unit(val, '');
         });
-        
+
     }
     // return a curried version of self. awesome-o. 
     return function(d) {
