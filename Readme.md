@@ -1,7 +1,7 @@
 
 # beam
 
-  funky get/set styles on an element
+  because tractor beams are cool.
 
 ## Installation
 
