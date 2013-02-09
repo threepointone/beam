@@ -92,7 +92,6 @@ function(el, property) {
 
 // typeof style === 'number'
 
-
 function setStyle(el, prop, val) {
     if(typeof prop !== 'string') {
         each(prop, function(v, p) {
@@ -121,7 +120,7 @@ function track(el) {
     });
 
     // run a separate one for transforms
-    twain.transformer = Twain().update(function(step) {        
+    twain.transformer = Twain().update(function(step) {
         claw(el, step);
     });
     instances.push(twain);
@@ -138,8 +137,9 @@ function beam(el, to) {
         var prop = camelize(vendor(_prop) + _prop);
         if(!tracker.tweens[prop]) {
             var currentStyle = getStyle(el, prop);
+            var numerical = num(currentStyle);
             // this inits the specific Tween
-            var tween = tracker.$t(prop).from(num(currentStyle) || num(val));            
+            var tween = tracker.$t(prop).from(isValue(numerical) ? numerical : num(val));
             tween.unit = unit(currentStyle); // MASSIVE todo 
         }
 
@@ -161,10 +161,10 @@ beam.instances = instances;
 
 function animate() {
     raf(animate);
-    each(instances, function(t) {
-        t.update();
-        t.transformer.update();
-    });
+    // use a quick for loop
+    for(var i = 0, j = instances.length; i < j; i++) {
+        instances[i].update().transformer.update();
+    }
 }
 
 animate();
