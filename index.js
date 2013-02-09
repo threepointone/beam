@@ -1,8 +1,10 @@
 var claw = require('claw'),
-    Twain = require('twain');
-each = Twain.util.each, collect = Twain.util.collect, isValue = Twain.util.isValue;
+    Twain = require('twain'),
+    each = Twain.util.each,
+    isValue = Twain.util.isValue;
 
 
+// requestAnimationFrame stuff.
 var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || fallback;
 
 var prev = new Date().getTime();
@@ -13,7 +15,6 @@ function fallback(fn) {
     setTimeout(fn, ms);
     prev = curr;
 }
-
 
 var doc = document,
     numUnit = /^(?:[\+\-]=)?\d+(?:\.\d+)?(%|in|cm|mm|em|ex|pt|pc|px)$/,
@@ -28,8 +29,8 @@ var doc = document,
 
 function camelize(s) {
     return s.replace(/-(.)/g, function(m, m1) {
-        return m1.toUpperCase()
-    })
+        return m1.toUpperCase();
+    });
 }
 
 
@@ -38,7 +39,7 @@ function uppercase(p, a) {
 }
 
 function vendor(property) {
-
+    // return the vendor prefix for a given property. should even work with firefox fudging -webkit.
     var div = document.createElement('div');
     var x = 'Khtml Moz Webkit O ms '.split(' '),
         i;
@@ -71,23 +72,23 @@ function(el, property) {
 } : html.currentStyle ?
 
 function(el, property) {
-    property = camelize(property)
+    property = camelize(property);
 
     if(property == 'opacity') {
-        var val = 100
+        var val = 100;
         try {
-            val = el.filters['DXImageTransform.Microsoft.Alpha'].opacity
+            val = el.filters['DXImageTransform.Microsoft.Alpha'].opacity;
         } catch(e1) {
             try {
-                val = el.filters('alpha').opacity
+                val = el.filters('alpha').opacity;
             } catch(e2) {}
         }
-        return val / 100
+        return val / 100;
     }
     var value = el.currentStyle ? el.currentStyle[property] : null
-    return el.style[property] || value
+    return el.style[property] || value;
 } : function(el, property) {
-    return el.style[camelize(property)]
+    return el.style[camelize(property)];
 };
 
 // typeof style === 'number'
