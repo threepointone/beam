@@ -177,10 +177,12 @@ beam.instances = instances;
 beam.stop = function(el) {
     // stop/pause the anim loop
     // if not el, then stop EVERYTHING.
+    // todo
 };
 beam.start = function(el) {
     // start up the anim loop after being paused
     // if not el, start up everything
+    // todo
 }
 
 // start off animation loop. 
