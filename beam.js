@@ -9,7 +9,6 @@
         each = Twain.util.each,
         isValue = Twain.util.isValue;
 
-
     // requestAnimationFrame stuff.
     var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || fallback;
 
@@ -31,7 +30,6 @@
             opacity: 1,
             transform: 1
         };
-
 
     function camelize(s) {
         return s.replace(/-(.)/g, function(m, m1) {
@@ -145,7 +143,6 @@
         var o = {};
         var t = this;
         each(input, function(val, prop) {
-            console.log(prop, val, t);
             prop = camelize(vendor(prop) || '' + prop);
             if(typeof val === 'string') {
                 if(rgbOhex.test(val)) {
@@ -158,9 +155,7 @@
                 return;
             }
             o[prop] = val;
-
         });
-
         return o;
     }
 
@@ -230,21 +225,10 @@
     }
 
     beam.instances = instances;
-
-    beam.stop = function(el) {
-        // stop/pause the anim loop
-        // if not el, then stop EVERYTHING.
-        // todo
-    };
-    beam.start = function(el) {
-        // start up the anim loop after being paused
-        // if not el, start up everything
-        // todo
-    }
-
     beam.encode = encode;
 
     // start off animation loop. 
+    // todo - start/stop
 
     function animate() {
         raf(animate);
@@ -257,5 +241,4 @@
     animate();
 
     return beam;
-
 });
