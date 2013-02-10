@@ -81,7 +81,6 @@
     <script>
         
         var beam = require('beam'),
-            box = document.getElementById('boxes'),
             each = beam.Twain.util.each,    // guh
             extend = beam.Twain.util.extend, // double guh
             boxes = document.getElementsByClassName('box');
@@ -89,44 +88,49 @@
         
 
         setInterval(function(){
-            each(boxes, function(b){
-                beam(b, {
-                    opacity: 0.2 + Math.random()*0.8,
-                    'background-color': ('#'+(Math.random()*0xFFFFFF<<0).toString(16)),
-                    borderRadius: Math.random()*40 + 'px',
-                    height: 10 + Math.random()*110 + 'px',
-                    width: 10 + Math.random()*110 + 'px',
-                    top:Math.random()*250 + 'px',
-                    left: Math.random()*250+ 'px',
-                    transform:{
-                        // translateX: Math.random()*250 + 'px',
-                        // translateY: Math.random()*250 + 'px',
-                        // translateZ: Math.random()*200 + 'px',
-                        // rotateX: (Math.random()*360 - 360) + 'deg',
-                        // rotateY: (Math.random()*360 - 360) + 'deg',
-                        rotateZ: (Math.random()*360 - 360) + 'deg'
-                        
-                    }
-                });
+            each(boxes, function(box){
+                setTimeout((function(b){
+                    return function(){
+                        beam(b, {
+                            opacity: 0.2 + Math.random()*0.8,
+                            'background-color': ('#'+(Math.random()*0xFFFFFF<<0).toString(16)),
+                            borderRadius: Math.random()*40 + 'px',
+                            height: 10 + Math.random()*110 + 'px',
+                            width: 10 + Math.random()*110 + 'px',
+                            top:Math.random()*250 + 'px',
+                            left: Math.random()*250+ 'px',
+                            transform:{
+                                // translateX: Math.random()*250 + 'px',
+                                // translateY: Math.random()*250 + 'px',
+                                // translateZ: Math.random()*200 + 'px',
+                                // rotateX: (Math.random()*360 - 360) + 'deg',
+                                // rotateY: (Math.random()*360 - 360) + 'deg',
+                                rotateZ: (Math.random()*360 - 360) + 'deg'
+                                
+                            }
+                        });
 
-                // mess with the speeds of individual tweeners
-                each(b.__beam__.tweens, function(t, k){
-                    if(t.multiplier){
-                        t.multiplier = Math.random()*0.002
-                    }
-                    if(t.tweens && t.tweens.r){
-                        t.tweens.r.multiplier = t.tweens.g.multiplier = t.tweens.b.multiplier = Math.random()*0.002;
-                    }
-                });
+                        // mess with the speeds of individual tweeners
+                        each(b.__beam__.tweens, function(t, k){
+                            if(t.multiplier){
+                                t.multiplier = Math.random()*0.002
+                            }
+                            if(t.tweens && t.tweens.r){
+                                t.tweens.r.multiplier = t.tweens.g.multiplier = t.tweens.b.multiplier = Math.random()*0.002;
+                            }
+                        });
 
-                each(b.__beam__.transformer.tweens, function(t, k){
-                    if(t.multiplier){
-                        t.multiplier = Math.random()*0.0008
-                    }
-                });                
+                        each(b.__beam__.transformer.tweens, function(t, k){
+                            if(t.multiplier){
+                                t.multiplier = Math.random()*0.0008
+                            }
+                        });           
+                    }   
+                })(box), Math.random()*400);
+                             
             });
 
-        },1500);
+        },900);
 
 
 
