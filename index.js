@@ -17,7 +17,7 @@ function fallback(fn) {
 }
 
 var doc = document,
-    numUnit = /^(?:[\+\-]=)?\d+(?:\.\d+)?(%|in|cm|mm|em|ex|pt|pc|px)$/,
+    // numUnit = /^(?:[\+\-]=)?\d+(?:\.\d+)?(%|in|cm|mm|em|ex|pt|pc|px)$/,
     unitless = {
         lineHeight: 1,
         zoom: 1,
@@ -92,7 +92,7 @@ function(el, property) {
 
 function setStyle(el, prop, val) {
     // "special" setStyle
-    // fyi: typeof val === 'number'
+    // fyi: typeof val === 'number', or and rgb hash
     if(typeof prop !== 'string') {
         each(prop, function(v, p) {
             setStyle(el, p, v);
@@ -105,8 +105,59 @@ function setStyle(el, prop, val) {
     // because we're getting a number, we need to add unit to it 
     // we get that directly from the __beam__ stored on the element
     // fuck me, right?
+    if(val.r) {
+        el.style[prop] = rgb(val.r, val.g, val.b);
+        return;
+    }
     el.style[prop] = val + (unitless[prop] ? '' : el.__beam__.$t(prop).unit);
 }
+
+// convert rgb and short hex to long hex
+
+function toHex(c) {
+    var m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    // short skirt to long jacket
+    return(m ? rgb(m[1], m[2], m[3]) : c).replace(/#(\w)(\w)(\w)$/, '#$1$1$2$2$3$3');
+}
+
+function encodeColor(hex) {
+    hex = toHex(hex);
+    return {
+        r: 16 * parseInt(hex.charAt(1), 16) + parseInt(hex.charAt(2), 16),
+        g: 16 * parseInt(hex.charAt(3), 16) + parseInt(hex.charAt(4), 16),
+        b: 16 * parseInt(hex.charAt(5), 16) + parseInt(hex.charAt(5), 16)
+    };
+}
+
+var rgbOhex = /^rgb\(|#/;
+
+function rgb(r, g, b) {
+    return '#' + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)
+}
+
+function encode(input) {
+    var o = {};
+    var t = this;
+    each(input, function(val, prop) {
+        console.log(prop, val, t);
+        prop = camelize(vendor(prop) || '' + prop);
+        if(typeof val === 'string') {
+            if(rgbOhex.test(val)) {
+                o[prop] = encodeColor(val);
+
+                return;
+            }
+            o[prop] = num(val);
+            // we're assuming the tweens already exist
+            return;
+        }
+        o[prop] = val;
+
+    });
+
+    return o;
+}
+
 
 var instances = [];
 
@@ -117,7 +168,9 @@ function track(el) {
         return el.__beam__;
     }
 
-    var twain = Twain().update(function(step) {
+    var twain = Twain({
+        encode: encode
+    }).update(function(step) {
         setStyle(el, step);
     });
 
@@ -139,28 +192,31 @@ function track(el) {
 function beam(el, to) {
     var tracker = track(el);
     var o = {};
-    each(to, function(val, _prop) {
+    each(to, function(val, prop) {
+        prop = camelize(vendor(prop) + prop);
+        if(prop.toLowerCase() === claw.transform.toLowerCase()) {
+            each(val, function(v, p) {
 
-        if(_prop === 'transform') return;
-        var prop = camelize(vendor(_prop) + _prop);
+                var tween = tracker.transformer.$t(p).to(num(v));
+                tween.unit = unit(v, '') || tween.unit || '';
+            });
+            return;
+        }
+
         if(!tracker.tweens[prop]) {
             var currentStyle = getStyle(el, prop);
-            var numerical = num(currentStyle);
-            // this inits the specific Tween
-            var tween = tracker.$t(prop).from(isValue(numerical) ? numerical : num(val));
-            tween.unit = unit(currentStyle, 'px');
+            if(rgbOhex.test(currentStyle)) {
+                var tween = tracker.$t(prop, true).from(encodeColor(currentStyle));
+            } else {
+                var numerical = num(currentStyle);
+                // this inits the specific Tween
+                var tween = tracker.$t(prop).from(isValue(numerical) ? numerical : num(val));
+                tween.unit = unit(currentStyle, 'px');
+            }
         }
-        tracker.$t(prop).to(num(val));
+        tracker.$t(prop).to(rgbOhex.test(val) ? encodeColor(val) : num(val));
     });
 
-    if(to.transform) {
-        each(to.transform, function(val, prop) {
-            // not doing the currentStyle business here.
-            // yet.
-            tracker.transformer.$t(prop).to(num(val)).unit = unit(val, '');
-        });
-
-    }
     // return a curried version of self. awesome-o. 
     return function(d) {
         return beam(el, d);
