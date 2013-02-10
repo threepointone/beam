@@ -3,34 +3,27 @@
     else if(typeof define == 'function' && define.amd) define(definition);
     else context[name] = definition();
 })('beam', this, function() {    
+
+    // first get your modules
+
     var req = typeof require === 'function';
     var claw = req ? require('claw') : claw,
         Twain = req ? require('twain') : Twain,
+        // import some useful functions
         each = Twain.util.each,
-        isValue = Twain.util.isValue;
-
-    // requestAnimationFrame stuff.
-    var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || fallback;
-
-    var prev = new Date().getTime();
-
-    function fallback(fn) {
-        var curr = new Date().getTime();
-        var ms = Math.max(0, 16 - (curr - prev));
-        setTimeout(fn, ms);
-        prev = curr;
-    }
-
-    var doc = document,
-        // numUnit = /^(?:[\+\-]=)?\d+(?:\.\d+)?(%|in|cm|mm|em|ex|pt|pc|px)$/,
+        isValue = Twain.util.isValue,
+        // some globals 
+        doc = document,
         unitless = {
             lineHeight: 1,
             zoom: 1,
             zIndex: 1,
             opacity: 1,
             transform: 1
-        };
+        };        
 
+    // a whole bunch of usefule functions
+    
     function camelize(s) {
         return s.replace(/-(.)/g, function(m, m1) {
             return m1.toUpperCase();
@@ -40,6 +33,7 @@
     function uppercase(p, a) {
         return a.toUpperCase();
     }
+
 
     function vendor(property) {
         // return the vendor prefix for a given property. should even work with firefox fudging -webkit.
@@ -56,7 +50,7 @@
 
     function unit(style, def) {
         // extracts the unit part of the string. px, em, whatever. 
-        return(/[a-z]+/.exec(style) || [def])[0]
+        return(/(%|in|cm|mm|em|ex|pt|pc|px|deg)+/.exec(style) || [def])[0];
     }
 
     function num(style) {
@@ -109,6 +103,8 @@
         // because we're getting a number, we need to add unit to it 
         // we get that directly from the __beam__ stored on the element
         // fuck me, right?
+
+        // first check if it's an rgb triplet
         if(val.r) {
             el.style[prop] = rgb(val.r, val.g, val.b);
             return;
@@ -125,6 +121,7 @@
     }
 
     function encodeColor(hex) {
+        // get an rgb triad from a hex/rgb() val
         hex = toHex(hex);
         return {
             r: 16 * parseInt(hex.charAt(1), 16) + parseInt(hex.charAt(2), 16),
@@ -140,18 +137,18 @@
     }
 
     function encode(input) {
+        // this will be our twain's encode function, responsible for converting strings and what not into numbers before being processed
         var o = {};
-        var t = this;
         each(input, function(val, prop) {
+            // first convert the label to a vendor prefixed, camelized version
             prop = camelize(vendor(prop) || '' + prop);
             if(typeof val === 'string') {
+                // if it's a color, then make the rgb triad
                 if(rgbOhex.test(val)) {
                     o[prop] = encodeColor(val);
-
                     return;
                 }
-                o[prop] = num(val);
-                // we're assuming the tweens already exist
+                o[prop] = num(val);                
                 return;
             }
             o[prop] = val;
@@ -159,9 +156,10 @@
         return o;
     }
 
-
+    // maintain of all "tractor beams".
     var instances = [];
 
+    // set up a twain on an element, with update fns
     function track(el) {
         // lemme know when proper object hashes become mainstream. 
         // until then, carry on young man
@@ -190,14 +188,15 @@
         return twain;
     }
 
+
     function beam(el, to) {
+        // let's haul it in. , scotty. 
         var tracker = track(el);
         var o = {};
         each(to, function(val, prop) {
             prop = camelize(vendor(prop) + prop);
             if(prop === claw.transform) {
                 each(val, function(v, p) {
-
                     var tween = tracker.transformer.$t(p).to(num(v));
                     tween.unit = unit(v, '') || tween.unit || '';
                 });
@@ -215,6 +214,11 @@
                     tween.unit = unit(currentStyle, 'px');
                 }
             }
+            var tween = tracker.$t(prop);
+            if(typeof val==='string' && !rgbOhex.test(val) && unit(val, 'px')!== tween.unit){
+                tween.unit = unit(val, 'px');
+                tween.from(num(val));
+            }
             tracker.$t(prop).to(rgbOhex.test(val) ? encodeColor(val) : num(val));
         });
 
@@ -224,11 +228,21 @@
         };
     }
 
-    beam.instances = instances;
-    beam.encode = encode;
-
+    
     // start off animation loop. 
     // todo - start/stop
+
+    // requestAnimationFrame stuff.
+    var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || fallback;
+
+    var prev = new Date().getTime();
+
+    function fallback(fn) {
+        var curr = new Date().getTime();
+        var ms = Math.max(0, 16 - (curr - prev));
+        setTimeout(fn, ms);
+        prev = curr;
+    }
 
     function animate() {
         raf(animate);
@@ -240,5 +254,11 @@
 
     animate();
 
+    // some more export
+    beam.instances = instances;
+    beam.encode = encode;
+    beam.Twain = Twain;
+    beam.claw = claw;
+    
     return beam;
 });
