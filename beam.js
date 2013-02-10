@@ -2,7 +2,7 @@
     if(typeof module != 'undefined' && module.exports) module.exports = definition();
     else if(typeof define == 'function' && define.amd) define(definition);
     else context[name] = definition();
-})('beam', this, function() {
+})('beam', this, function() {    
     var req = typeof require === 'function';
     var claw = req ? require('claw') : claw,
         Twain = req ? require('twain') : Twain,
@@ -45,7 +45,7 @@
 
     function vendor(property) {
         // return the vendor prefix for a given property. should even work with firefox fudging -webkit.
-        var div = document.createElement('div');
+        var div = doc.createElement('div');
         var x = 'Khtml Moz Webkit O ms '.split(' '),
             i;
         for(i = x.length - 1; i >= 0; i--) {
@@ -200,7 +200,7 @@
         var o = {};
         each(to, function(val, prop) {
             prop = camelize(vendor(prop) + prop);
-            if(prop.toLowerCase() === claw.transform.toLowerCase()) {
+            if(prop === claw.transform) {
                 each(val, function(v, p) {
 
                     var tween = tracker.transformer.$t(p).to(num(v));
@@ -241,6 +241,8 @@
         // if not el, start up everything
         // todo
     }
+
+    beam.encode = encode;
 
     // start off animation loop. 
 

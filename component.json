@@ -11,6 +11,7 @@
   "development": {},
   "license": "MIT",
   "scripts": [
-    "index.js"
-  ]
+    "beam.js"
+  ],
+  "main":"beam.js"
 }

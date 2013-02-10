@@ -2,10 +2,14 @@
   "name": "beam",
   "version": "0.0.0",
   "description": "funky get/set styles on an element",
-  "main": "index.js",
+  "main": "beam.js",
   "scripts": {
     "test": ""
   },
+  "dependencies":{
+    "twain": "git://github.com/threepointone/twain.git",
+    "claw":"git://github.com/threepointone/claw.git"
+    },
   "repository": "",
   "keywords": [
     "css",
