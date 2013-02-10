@@ -16,8 +16,20 @@
 based on [twain](https://github.com/threepointone/twain) and [claw](https://github.com/threepointone/claw).
 
 ```js
-// come back later. top men are on the job.
+
+var el = document.getELementById('box');
+
+document.body.addEventListener('mousemove', function(e){
+    beam(el,{
+        top: e.clientY + 'px',
+        left: e.clientX + 'px'
+    });
+});
+
+// 
+
 ```
+ - makes the box follow the mouse. it sounds silly, I know. The [demo's](http://threepointone.github.com/beam/) trippier.
 
 ## License
 
