@@ -109,6 +109,8 @@
             el.style[prop] = rgb(val.r, val.g, val.b);
             return;
         }
+        // the following line is easily the most expensive line in the entire lib. 
+        // and that's why kids, you never make a css animation engine
         el.style[prop] = val + (unitless[prop] ? '' : el.__beam__.$t(prop).unit);
     }
 
@@ -211,12 +213,12 @@
                     var numerical = num(currentStyle);
                     // this inits the specific Tween
                     var tween = tracker.$t(prop).from(isValue(numerical) ? numerical : num(val));
-                    tween.unit = unit(currentStyle, 'px');
+                    tween.unit = unit(currentStyle, '');
                 }
             }
             var tween = tracker.$t(prop);
-            if(typeof val==='string' && !rgbOhex.test(val) && unit(val, 'px')!== tween.unit){
-                tween.unit = unit(val, 'px');
+            if(typeof val==='string' && !rgbOhex.test(val) && unit(val, '')!== tween.unit){
+                tween.unit = unit(val, '');
                 tween.from(num(val));
             }
             tracker.$t(prop).to(rgbOhex.test(val) ? encodeColor(val) : num(val));
@@ -245,11 +247,12 @@
     }
 
     function animate() {
-        raf(animate);
+        
         // use a quick for loop
         for(var i = 0, j = instances.length; i < j; i++) {
             instances[i].update().transformer.update();
         }
+        raf(animate);
     }
 
     animate();
@@ -259,6 +262,8 @@
     beam.encode = encode;
     beam.Twain = Twain;
     beam.claw = claw;
-    
+    beam.getStyle = getStyle;
+    beam.raf = raf;
+
     return beam;
 });

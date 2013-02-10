@@ -8,6 +8,7 @@
             height:100%;
             padding:0;
             margin:0;
+            background-color: black;
 
         }
 
@@ -15,8 +16,12 @@
             width:100px;
             height:100px;
             position:absolute;
-            top:1px;
-            left:1px;
+            top:100px;
+            left:100px;
+            -webkit-transform: translateZ(0);
+            -webkit-perspective: 400;
+            cursor:none;
+            /*-webkit-backface-visibility: hidden;*/
 
         }
         .box{
@@ -29,11 +34,13 @@
             top:0;
             left:0;
             opacity:0;
+            /*-webkit-transform: translateZ(0);*/
+            /*-webkit-perspective: 1000;*/
+            /*-webkit-backface-visibility: hidden;*/
         }
     </style>
 </head>
 <body>
-    
     <div id="boxes">
         <div class="box"></div>
         <div class="box"></div>
@@ -49,64 +56,61 @@
         <div class="box"></div>
         <div class="box"></div>
         <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
+        
     </div>
+        
     <script src="build/build.js"></script>
     
     <script>
         
         var beam = require('beam'),
             box = document.getElementById('boxes'),
+            each = beam.Twain.util.each,    // guh
+            extend = beam.Twain.util.extend, // double guh
             boxes = document.getElementsByClassName('box');
+            center = {top:0, left:0};
         
 
         setInterval(function(){
-
-            for(var i = 0; i<boxes.length;i++) {
-                beam(boxes[i], {
-                    opacity: 0.2 + Math.random()*0.6,
-                    'background-color': ('#'+Math.floor(Math.random()*16777215).toString(16)),
+            each(boxes, function(b){
+                beam(b, {
+                    opacity: 0.2 + Math.random()*0.8,
+                    'background-color': ('#'+(Math.random()*0xFFFFFF<<0).toString(16)),
                     borderRadius: Math.random()*40 + 'px',
-                    height: 20 + Math.random()*80 + 'px',
-                    width: 20 + Math.random()*80 + 'px',
-                    top:Math.random()*250 + 'px',
-                    left: Math.random()*250 + 'px',
+                    height: 10 + Math.random()*110 + 'px',
+                    width: 10 + Math.random()*110 + 'px',
+                    // top:Math.random()*250 + 'px',
+                    // left: Math.random()*250+ 'px',
                     transform:{
-                        rotate: (Math.random()*360 - 360) + 'deg',
+                        translateX: Math.random()*250 + 'px',
+                        translateY: Math.random()*250 + 'px',
+                        // translateZ: Math.random()*200 + 'px',
+                        rotateX: (Math.random()*360 - 360) + 'deg',
+                        rotateY: (Math.random()*360 - 360) + 'deg',
+                        rotateZ: (Math.random()*360 - 360) + 'deg'
                         
                     }
-                });    
-            }
+                });
 
-        },800);
+                each(b.__beam__.tweens, function(t, k){
 
-        document.body.addEventListener('mousemove', function(e){
-            beam(box, {
-                top:e.clientY - 100,
-                left:e.clientX + 50
+                    if(t.multiplier){
+                        t.multiplier = Math.random()*0.002
+                    }
+                });
+
+                each(b.__beam__.transformer.tweens, function(t, k){
+
+                    if(t.multiplier){
+                        t.multiplier = Math.random()*0.0008
+                    }
+                });
+                
             });
-        });
+
+
+        },1500);
+
 
 
 
