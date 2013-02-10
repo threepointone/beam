@@ -6,7 +6,7 @@
         #box{
             width:200px;
             height:200px;
-            background-color: gray;
+            background-color: #eeeeee;
             position: absolute;
             border-radius: 0;
             top:0;
@@ -30,18 +30,19 @@
                 top:Math.random()*400,
                 left:Math.random()*400,
                 opacity: Math.random()*2,
+                'background-color': ('#'+Math.floor(Math.random()*16777215).toString(16)),
                 'border-radius': Math.random()*40,
-                // height: Math.random()*200,
-                // width: Math.random()*200,
+                height: Math.random()*200,
+                width: Math.random()*200,
                 transform:{
                     rotate: (Math.random()*360 - 360) + 'deg',
-                    skewX: Math.random()*80 + 'deg',
-                    skewY: Math.random()*80 + 'deg',
+                    // skewX: Math.random()*30 + 'deg',
+                    // skewY: Math.random()*30 + 'deg',
                     // scaleX:(Math.random()*2) + 0.1,
                     scale:(Math.random()*2) + 0.1
                 }
             });
-        },800);
+        },500);
 
     </script>
 
