@@ -72,9 +72,21 @@
         <div class="box"></div>
         <div class="box"></div>
         <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
 
+
+
+ 
         
     </div>
+
+ 
+
         
     <script src="build/build.js"></script>
     
@@ -97,11 +109,10 @@
                             borderRadius: Math.random()*40 + 'px',
                             height: 10 + Math.random()*110 + 'px',
                             width: 10 + Math.random()*110 + 'px',
-                            top:Math.random()*250 + 'px',
-                            left: Math.random()*250+ 'px',
+                            
                             transform:{
-                                // translateX: Math.random()*250 + 'px',
-                                // translateY: Math.random()*250 + 'px',
+                                translateX: (Math.random()*250) + 'px',
+                                translateY: (Math.random()*250) + 'px',
                                 // translateZ: Math.random()*200 + 'px',
                                 // rotateX: (Math.random()*360 - 360) + 'deg',
                                 // rotateY: (Math.random()*360 - 360) + 'deg',
@@ -132,6 +143,15 @@
 
         },900);
 
+        document.body.addEventListener('mousemove', function(e){
+            each(boxes, function(b){
+                beam(b, {
+                    top:(e.clientY  -250 )+ 'px',
+                    left: (e.clientX -250)+ 'px'
+                });
+            });
+        });
+
 
 
 
@@ -142,6 +162,11 @@
         // scale:(Math.random()*2) + 0.1
 
     </script>
+
+    <script>
+        (function(){var script=document.createElement('script');script.src='http://github.com/mrdoob/stats.js/raw/master/build/stats.min.js';document.body.appendChild(script);script=document.createElement('script');script.innerHTML='var interval=setInterval(function(){if(typeof Stats==\'function\'){clearInterval(interval);var stats=new Stats();stats.domElement.style.position=\'fixed\';stats.domElement.style.right=\'0px\';stats.domElement.style.top=\'0px\';stats.domElement.style.zIndex=\'10000\';document.body.appendChild(stats.domElement);setInterval(function(){stats.update();},1000/60);}},100);';document.body.appendChild(script);})();
+    </script>
+
 
     <script type="text/javascript">
 
