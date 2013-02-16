@@ -535,10 +535,9 @@ require.register("beam/beam.js", function(exports, require, module){
     if(typeof module != 'undefined' && module.exports) module.exports = definition();
     else if(typeof define == 'function' && define.amd) define(definition);
     else context[name] = definition();
-})('beam', this, function() {    
+})('beam', this, function() {
 
     // first get your modules
-
     var req = typeof require === 'function';
     var claw = req ? require('claw') : claw,
         Twain = req ? require('twain') : Twain,
@@ -553,10 +552,10 @@ require.register("beam/beam.js", function(exports, require, module){
             zIndex: 1,
             opacity: 1,
             transform: 1
-        };        
+        };
 
     // a whole bunch of usefule functions
-    
+
     function camelize(s) {
         return s.replace(/-(.)/g, function(m, m1) {
             return m1.toUpperCase();
@@ -624,7 +623,6 @@ require.register("beam/beam.js", function(exports, require, module){
     function setStyle(el, prop, val) {
         // "special" setStyle
         // fyi: typeof val === 'number', or and rgb hash
-
         var b = el.__beam__;
         var prev = b.prev;
 
@@ -640,15 +638,13 @@ require.register("beam/beam.js", function(exports, require, module){
         // because we're getting a number, we need to add unit to it 
         // we get that directly from the __beam__ stored on the element
         // fuck me, right?
-
         // for perf, store a prev value on the __beam__. makes this infinitely more usable for multiple ui elements
-
 
         // first check if it's an rgb triplet
         if(val.r) {
 
             var color = rgb(val.r, val.g, val.b);
-            if(color !== prev[prop]){
+            if(color !== prev[prop]) {
                 el.style[prop] = rgb(val.r, val.g, val.b);
                 prev[prop] = color;
 
@@ -658,14 +654,14 @@ require.register("beam/beam.js", function(exports, require, module){
         }
 
 
-        if(prev[prop]!==val){
+        if(prev[prop] !== val) {
 
             // the following line is easily the most expensive line in the entire lib. 
             // and that's why kids, you never make a css animation engine
             el.style[prop] = val + (unitless[prop] ? '' : b.$t(prop).unit);
             prev[prop] = val;
         }
-        
+
     }
 
     // convert rgb and short hex to long hex
@@ -704,7 +700,7 @@ require.register("beam/beam.js", function(exports, require, module){
                     o[prop] = encodeColor(val);
                     return;
                 }
-                o[prop] = num(val);                
+                o[prop] = num(val);
                 return;
             }
             o[prop] = val;
@@ -716,6 +712,8 @@ require.register("beam/beam.js", function(exports, require, module){
     var instances = [];
 
     // set up a twain on an element, with update fns
+
+
     function track(el) {
         // lemme know when proper object hashes become mainstream. 
         // until then, carry on young man
@@ -729,8 +727,7 @@ require.register("beam/beam.js", function(exports, require, module){
             setStyle(el, step);
         });
 
-        twain.prev = {};// keep a place to cache previous step
-
+        twain.prev = {}; // keep a place to cache previous step
         // run a separate one for transforms
         var transformer = twain.transformer = Twain().update(function(step) {
             // get back units
@@ -740,15 +737,14 @@ require.register("beam/beam.js", function(exports, require, module){
             });
 
             // todo - optimize the cond. 
-            if(claw.formatTransform(o) !== transformer.prev){
+            if(claw.formatTransform(o) !== transformer.prev) {
                 claw(el, o);
                 transformer.prev = claw.formatTransform(o);
             }
-            
+
         });
 
-        transformer.prev = '';// keep a place to cache previous step
-
+        transformer.prev = ''; // keep a place to cache previous step
         instances.push(twain);
 
         el.__beam__ = twain;
@@ -782,7 +778,7 @@ require.register("beam/beam.js", function(exports, require, module){
                 }
             }
             var tween = tracker.$t(prop);
-            if(typeof val==='string' && !rgbOhex.test(val) && unit(val, '')!== tween.unit){
+            if(typeof val === 'string' && !rgbOhex.test(val) && unit(val, '') !== tween.unit) {
                 tween.unit = unit(val, '');
                 tween.from(num(val));
             }
@@ -795,10 +791,9 @@ require.register("beam/beam.js", function(exports, require, module){
         };
     }
 
-    
+
     // start off animation loop. 
     // todo - start/stop
-
     // requestAnimationFrame stuff.
     var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || fallback;
 
@@ -812,7 +807,7 @@ require.register("beam/beam.js", function(exports, require, module){
     }
 
     function animate() {
-        
+
         // use a quick for loop
         for(var i = 0, j = instances.length; i < j; i++) {
             instances[i].update().transformer.update();
