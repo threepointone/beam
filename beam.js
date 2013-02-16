@@ -91,6 +91,10 @@
     function setStyle(el, prop, val) {
         // "special" setStyle
         // fyi: typeof val === 'number', or and rgb hash
+
+        var b = el.__beam__;
+        var prev = b.prev;
+
         if(typeof prop !== 'string') {
             each(prop, function(v, p) {
                 setStyle(el, p, v);
@@ -104,14 +108,31 @@
         // we get that directly from the __beam__ stored on the element
         // fuck me, right?
 
+        // for perf, store a prev value on the __beam__. makes this infinitely more usable for multiple ui elements
+
+
         // first check if it's an rgb triplet
         if(val.r) {
-            el.style[prop] = rgb(val.r, val.g, val.b);
+
+            var color = rgb(val.r, val.g, val.b);
+            if(color !== prev[prop]){
+                el.style[prop] = rgb(val.r, val.g, val.b);
+                prev[prop] = color;
+
+            }
+
             return;
         }
-        // the following line is easily the most expensive line in the entire lib. 
-        // and that's why kids, you never make a css animation engine
-        el.style[prop] = val + (unitless[prop] ? '' : el.__beam__.$t(prop).unit);
+
+
+        if(prev[prop]!==val){
+
+            // the following line is easily the most expensive line in the entire lib. 
+            // and that's why kids, you never make a css animation engine
+            el.style[prop] = val + (unitless[prop] ? '' : b.$t(prop).unit);
+            prev[prop] = val;
+        }
+        
     }
 
     // convert rgb and short hex to long hex
@@ -175,6 +196,8 @@
             setStyle(el, step);
         });
 
+        twain.prev = {};// keep a place to cache previous step
+
         // run a separate one for transforms
         var transformer = twain.transformer = Twain().update(function(step) {
             // get back units
@@ -182,8 +205,17 @@
             each(step, function(val, prop) {
                 o[prop] = val + (unitless[prop] ? '' : transformer.$t(prop).unit);
             });
-            claw(el, o);
+
+            // todo - optimize the cond. 
+            if(claw.formatTransform(o) !== transformer.prev){
+                claw(el, o);
+                transformer.prev = claw.formatTransform(o);
+            }
+            
         });
+
+        transformer.prev = '';// keep a place to cache previous step
+
         instances.push(twain);
 
         el.__beam__ = twain;
@@ -257,7 +289,7 @@
 
     animate();
 
-    // some more export
+    // some more exports
     beam.instances = instances;
     beam.encode = encode;
     beam.Twain = Twain;
