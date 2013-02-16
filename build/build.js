@@ -357,6 +357,9 @@ require.register("threepointone-twain/lib/twain.js", function(exports, require, 
         stop: function() {
             this.time = null;
             return this;
+        },
+        multiply: function(n){
+            this.multiplier = typeof n === 'function'? n.apply(this) : n;            
         }
 
     });
@@ -378,7 +381,7 @@ require.register("threepointone-twain/lib/twain.js", function(exports, require, 
         this.decode = this.config.decode || identity;
 
         // reset the config encode/decode functions. we don't want it to propogate through
-        // ... or do we?
+        // ... or do we?        
         this.config.encode = this.config.decode = identity;
 
     }
@@ -415,6 +418,12 @@ require.register("threepointone-twain/lib/twain.js", function(exports, require, 
         },
         decoded: function(){
             return this.decode(this.value);
+        },
+
+        multiply: function(n){
+            each(this.tweens, function(t){
+                t.multiply(n);
+            });
         },
 
         _update: function() {

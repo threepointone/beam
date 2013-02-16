@@ -59,6 +59,21 @@
         <div class="box"></div>
         <div class="box"></div>
         <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
         
 
 
@@ -103,20 +118,15 @@
                         });
 
                         // mess with the speeds of individual tweeners
-                        each(b.__beam__.tweens, function(t, k){
-                            if(t.multiplier){
-                                t.multiplier = Math.random()*0.002
-                            }
-                            if(t.tweens && t.tweens.r){
-                                t.tweens.r.multiplier = t.tweens.g.multiplier = t.tweens.b.multiplier = Math.random()*0.002;
-                            }
+
+                        b.__beam__.multiply(function(){
+                            return Math.random()*0.002
                         });
 
-                        each(b.__beam__.transformer.tweens, function(t, k){
-                            if(t.multiplier){
-                                t.multiplier = Math.random()*0.0008
-                            }
-                        });           
+                        b.__beam__.transformer.multiply(function(){
+                            return Math.random()*0.002
+                        });
+                        
                     }   
                 })(box), Math.random()*400);
                              
