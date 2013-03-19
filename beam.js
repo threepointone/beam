@@ -121,7 +121,7 @@
         }
 
 
-        if(prev[prop] !== val) {
+        if(prev[prop] !== val) {            
 
             // the following line is easily the most expensive line in the entire lib. 
             // and that's why kids, you never make a css animation engine
@@ -234,7 +234,7 @@
             }
 
             if(!tracker.tweens[prop]) {
-                var currentStyle = getStyle(el, prop);
+                var currentStyle = getStyle(el, prop) || '';
                 if(rgbOhex.test(currentStyle)) {
                     var tween = tracker.$t(prop, true).from(encodeColor(currentStyle));
                 } else {
