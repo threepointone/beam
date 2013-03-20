@@ -168,9 +168,15 @@
                     return;
                 }
                 o[prop] = num(val);
-                return;
+                // return;
             }
-            o[prop] = val;
+            else{
+                o[prop] = val;    
+            }
+            if(prop==='zIndex'){
+                o[prop]= Math.round(o[prop]);
+            }
+            
         });
         return o;
     }
