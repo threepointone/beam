@@ -125,7 +125,7 @@
 
             // the following line is easily the most expensive line in the entire lib. 
             // and that's why kids, you never make a css animation engine
-            if(prop==='zIndex'){ val = Math.round(val); } // gah.
+            if(prop==='zIndex'){ val = Math.ceil(val); } // gah.
             el.style[prop] = val + (unitless[prop] ? '' : b.$t(prop).unit);
             prev[prop] = val;
         }
