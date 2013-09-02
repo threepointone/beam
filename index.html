@@ -114,14 +114,15 @@
  
 
         
-    <script src="build/build.js"></script>
+    <script src="dist/beam.js"></script>
     
     <script>
         
-        var beam = require('beam'),
-            each = beam.Twain.util.each,    // guh
-            extend = beam.Twain.util.extend, // double guh
-            boxes = document.getElementsByClassName('box');
+        
+            var _ = beam._,
+            each = _.each,    // guh
+            extend = _.extend, // double guh
+            boxes = [].slice.call(document.getElementsByClassName('box'), 0);
             center = {top:0, left:0};
         
 
@@ -191,15 +192,15 @@
 
     <script type="text/javascript">
 
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-38385950-1']);
-  _gaq.push(['_trackPageview']);
+  // var _gaq = _gaq || [];
+  // _gaq.push(['_setAccount', 'UA-38385950-1']);
+  // _gaq.push(['_trackPageview']);
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
+  // (function() {
+  //   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  //   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  //   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  // })();
 
 </script>
 

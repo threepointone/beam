@@ -1,11 +1,7 @@
+build: 
+	browserify -r ./index.js -s beam -o dist/beam.js
+	cat dist/beam.js | uglifyjs --mangle --compress -o dist/beam.min.js
+	cat dist/beam.min.js | gzip | wc -c
 
-build: components index.js
-	@component build --dev
-
-components: component.json
-	@component install --dev
-
-clean:
-	rm -fr build components template.js
-
-.PHONY: clean
+.PHONY: build
+	

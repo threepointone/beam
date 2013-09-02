@@ -6,10 +6,11 @@
   "scripts": {
     "test": ""
   },
-  "dependencies":{
+  "dependencies": {
+    "claw": "git://github.com/threepointone/claw.git",
     "twain": "git://github.com/threepointone/twain.git",
-    "claw":"git://github.com/threepointone/claw.git"
-    },
+    "fn": "git://github.com/threepointone/fn.git"
+  },
   "repository": "",
   "keywords": [
     "css",
