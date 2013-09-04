@@ -7,10 +7,6 @@
 
   gives a generic way to animate any numeric css val on an element. uses [twain](https://github.com/threepointone/twain) for animation
 
-## Installation
-
-    $ component install threepointone/beam
-
 ## API
 
 based on [twain](https://github.com/threepointone/twain) and [claw](https://github.com/threepointone/claw).
