@@ -262,9 +262,13 @@ function beam(el, to) {
     });
 
     // return a curried version of self. awesome-o. 
-    return function(d) {
+    var fn = function(d) {
         return beam(el, d);
     };
+    fn.multiply = function(n){
+        el.__beam__.transformer.multiply(n);
+    }
+    return ;
 }
 
 
