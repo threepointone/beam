@@ -1,4 +1,4 @@
-(function(e){if("function"==typeof bootstrap)bootstrap("beam",e);else if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else if("undefined"!=typeof ses){if(!ses.ok())return;ses.makeBeam=e}else"undefined"!=typeof window?window.beam=e():global.beam=e()})(function(){var define,ses,bootstrap,module,exports;
+!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.beam=e():"undefined"!=typeof global?global.beam=e():"undefined"!=typeof self&&(self.beam=e())}(function(){var define,module,exports;
 return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 // first get your modules
 
@@ -19,7 +19,7 @@ var claw = require('claw'),
 // which property name does this browser use for transform
 var transform = function() {
     var styles = doc.createElement('a').style,
-        props = ['webkitTransform', 'MozTransform', 'OTransform', 'msTransform', 'Transform'],
+        props = ['WebkitTransform', 'mozTransform', 'OTransform', 'msTransform', 'Transform', 'transform'],
         i;
     for (i = 0; i < props.length; i++) {
         if (props[i] in styles) return props[i];
@@ -42,7 +42,7 @@ function uppercase(p, a) {
 function vendor(property) {
     // return the vendor prefix for a given property. should even work with firefox fudging -webkit.
     var div = doc.createElement('div');
-    var x = 'Khtml Moz Webkit O ms '.split(' '),
+    var x = 'Khtml moz Webkit O ms '.split(' '),
         i;
     for (i = x.length - 1; i >= 0; i--) {
         if (((x[i] ? x[i] + '-' : '') + property).replace(/\-(\w)/g, uppercase) in div.style) {
@@ -180,6 +180,7 @@ function encode(input) {
             o[prop] = val;
         }
 
+
     });
     return o;
 }
@@ -234,6 +235,7 @@ function beam(el, to) {
     var o = {};
     _.each(to, function(val, prop) {
         prop = camelize(vendor(prop) + prop);
+        // console.log(claw.transform, prop)
         if (prop === claw.transform) {
             _.each(val, function(v, p) {
                 var tween = tracker.transformer.$t(p).to(num(v));
@@ -311,14 +313,14 @@ beam.raf = raf;
 beam._ = _;
 
 module.exports = beam;
-},{"claw":2,"fn":4,"twain":5}],2:[function(require,module,exports){
+},{"claw":2,"fn":3,"twain":4}],2:[function(require,module,exports){
 var _ = require('fn');
 module.exports = claw;
 
 
 var transform = (function() {
     var styles = document.createElement('a').style,
-        props = ['WebkitTransform', 'MozTransform', 'OTransform', 'msTransform', 'Transform'],
+        props = ['WebkitTransform', 'mozTransform', 'OTransform', 'msTransform', 'Transform', 'transform'],
         i;
     for (i = 0; i < props.length; i++) {
         if (props[i] in styles) return props[i];
@@ -357,7 +359,7 @@ function claw(el, vals) {
 claw.formatTransform = formatTransform;
 claw.transform = transform;
 },{"fn":3}],3:[function(require,module,exports){
-// fair caveat, this is code collected for various places, and I don't have tests yet. YET.
+// fair caveat, this is code collected from various places, and I don't have tests yet. YET.
 
 "use strict";
 
@@ -365,6 +367,8 @@ module.exports = {
     isValue: isValue,
     identity: identity,
     indexOf: indexOf,
+    keys: keys,
+    values: values,
     isArray: isArray,
     toArray: toArray,
     each: each,
@@ -376,7 +380,8 @@ module.exports = {
     find: find,
     reduce: reduce,
     debounce: debounce,
-    compose: compose
+    compose: compose,
+    chain: chain
 };
 
 var slice = [].slice,
@@ -384,7 +389,7 @@ var slice = [].slice,
     toString = {}.toString;
 
 function isValue(v) {
-    return ((v !== null) && (v !== undefined));
+    return v != null;
 }
 
 function identity(x) {
@@ -401,6 +406,29 @@ function indexOf(arr, obj) {
         }
     }
     return -1;
+}
+
+function keys(obj) {
+    if (obj !== Object(obj)) {
+        throw new TypeError('Invalid object');
+    }
+    var keys = [];
+    for (var key in obj) {
+        if (has.call(obj, key)) {
+            keys.push(key);
+        }
+    }
+    return keys;
+}
+
+function values(obj) {
+    var values = [];
+    for (var key in obj) {
+        if (has.call(obj, key)) {
+            values.push(obj[key]);
+        }
+    }
+    return values;
 }
 
 function isArray(obj) {
@@ -420,9 +448,7 @@ function toArray(obj) {
     if (obj.length === +obj.length) {
         return map(obj, identity);
     }
-    return map(obj, function(val) {
-        return val;
-    });
+    return values(obj);
 }
 
 function each(obj, fn) {
@@ -454,11 +480,8 @@ function extend(obj) {
 
 function map(obj, fn) {
     var arr = [];
-    var f = (typeof(fn) === 'string') ? function(o) {
-            return o[fn];
-        } : fn;
     each(obj, function(v, k) {
-        arr.push(f(v, k));
+        arr.push(fn(v, k));
     });
     return arr;
 }
@@ -534,15 +557,33 @@ function compose() {
     var funcs = arguments;
     return function() {
         var args = arguments;
-        for (var i = funcs.length - 1; i >= 0; i--) {
-            args = [funcs[i].apply(this, args)];
-        }
+        each(funcs, function(fn) {
+            args = [fn.apply(this, args)];
+        });
         return args[0];
     };
 }
+
+// chaining, à la underscore
+
+function chain(obj) {
+    if (!(this instanceof chain)) {
+        return new chain(obj);
+    }
+    this._obj = obj;
+}
+
+each(module.exports, function(fn, name) {
+    chain.prototype[name] = function() {
+        this._obj = fn.apply(this, [this._obj].concat(slice.call(arguments, 0)));
+        return this;
+    };
+});
+
+chain.prototype.val = function() {
+    return this._obj;
+};
 },{}],4:[function(require,module,exports){
-module.exports=require(3)
-},{}],5:[function(require,module,exports){
 var _ = require('fn');
 
 function collect(obj, fn) {
@@ -743,8 +784,7 @@ _.extend(Twain.prototype, {
 Twain.Tween = Tween;
 
 module.exports = Twain;
-},{"fn":6}],6:[function(require,module,exports){
-module.exports=require(3)
-},{}]},{},[1])(1)
+},{"fn":3}]},{},[1])
+(1)
 });
 ;

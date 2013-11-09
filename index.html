@@ -19,7 +19,9 @@
             top:100px;
             left:100px;
             -webkit-transform: translateZ(0);
+            -moz-transform: translateZ(0);
             -webkit-perspective: 400;
+            -moz-perspective: 400;
             cursor:none;
             /*-webkit-backface-visibility: hidden;*/
 
@@ -184,12 +186,12 @@
         // scale:(Math.random()*2) + 0.1
 
     </script>
-
+<!-- 
     <script>
         (function(){var script=document.createElement('script');script.src='http://github.com/mrdoob/stats.js/raw/master/build/stats.min.js';document.body.appendChild(script);script=document.createElement('script');script.innerHTML='var interval=setInterval(function(){if(typeof Stats==\'function\'){clearInterval(interval);var stats=new Stats();stats.domElement.style.position=\'fixed\';stats.domElement.style.right=\'0px\';stats.domElement.style.top=\'0px\';stats.domElement.style.zIndex=\'10000\';document.body.appendChild(stats.domElement);setInterval(function(){stats.update();},1000/60);}},100);';document.body.appendChild(script);})();
     </script>
 
-
+ -->
     <script type="text/javascript">
 
   // var _gaq = _gaq || [];

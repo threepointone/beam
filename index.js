@@ -17,7 +17,7 @@ var claw = require('claw'),
 // which property name does this browser use for transform
 var transform = function() {
     var styles = doc.createElement('a').style,
-        props = ['webkitTransform', 'MozTransform', 'OTransform', 'msTransform', 'Transform'],
+        props = ['WebkitTransform', 'mozTransform', 'OTransform', 'msTransform', 'Transform', 'transform'],
         i;
     for (i = 0; i < props.length; i++) {
         if (props[i] in styles) return props[i];
@@ -40,7 +40,7 @@ function uppercase(p, a) {
 function vendor(property) {
     // return the vendor prefix for a given property. should even work with firefox fudging -webkit.
     var div = doc.createElement('div');
-    var x = 'Khtml Moz Webkit O ms '.split(' '),
+    var x = 'Khtml moz Webkit O ms '.split(' '),
         i;
     for (i = x.length - 1; i >= 0; i--) {
         if (((x[i] ? x[i] + '-' : '') + property).replace(/\-(\w)/g, uppercase) in div.style) {
@@ -177,6 +177,7 @@ function encode(input) {
         } else {
             o[prop] = val;
         }
+
 
     });
     return o;
