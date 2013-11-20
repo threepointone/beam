@@ -118,10 +118,11 @@ function setStyle(el, prop, val) {
         if (color !== prev[prop]) {
             el.style[prop] = rgb(val.r, val.g, val.b);
             prev[prop] = color;
+            return;
 
         }
 
-        return;
+        return true;
     }
 
 
@@ -134,7 +135,9 @@ function setStyle(el, prop, val) {
         } // gah.
         el.style[prop] = val + (unitless[prop] ? '' : b.$t(prop).unit);
         prev[prop] = val;
+        return;
     }
+    return true;
 
 }
 
@@ -229,13 +232,12 @@ function track(el) {
 }
 
 
-function beam(el, to) {
+function beam(el, to, on) {
     // let's haul it in. , scotty. 
     var tracker = track(el);
     var o = {};
     _.each(to, function(val, prop) {
         prop = camelize(vendor(prop) + prop);
-        // console.log(claw.transform, prop)
         if (prop === claw.transform) {
             _.each(val, function(v, p) {
                 var tween = tracker.transformer.$t(p).to(num(v));
@@ -268,9 +270,10 @@ function beam(el, to) {
         return beam(el, d);
     };
     fn.multiply = function(n){
+        el.__beam__.multiply(n);
         el.__beam__.transformer.multiply(n);
     }
-    return ;
+    return fn;
 }
 
 
